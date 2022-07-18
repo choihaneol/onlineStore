@@ -43,6 +43,8 @@ namespace API
 
             });
 
+            //core 추가
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,6 +60,14 @@ namespace API
             //app.UseHttpsRedirection();
 
             app.UseRouting();
+
+
+            //core를 사용해서 header 생성 like "Access-Control-Allow-Origin"
+            app.UseCors(opt =>
+            {
+                opt.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+            });
+
 
             app.UseAuthorization();
 
