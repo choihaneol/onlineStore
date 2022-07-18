@@ -2,18 +2,26 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './app/layout/App';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter } from "react-router-dom";
 
-//Domain React Model  -> App.tsx
+
+/*
+react router(URL matching, http requset)를 사용해서 
+페이지를 reload하는 대신 component끼리 swapping하여 SPA 적용
+*/
+
+//BrowserRouter: browse's history object and keeps and track of the states
+
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <App /> 
+    <BrowserRouter>
+        <App /> 
+    </BrowserRouter>
   </React.StrictMode>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
