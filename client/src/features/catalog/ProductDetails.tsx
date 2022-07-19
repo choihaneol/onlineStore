@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import axios from "axios";
 import { Product } from "../../app/models/product";
+import agent from "../../app/api/agents";
 
 //useParams : returns object of key/value pairs of URL parameters
 export default function ProductDetails() {
@@ -12,8 +13,8 @@ export default function ProductDetails() {
 
     //사용자의 요청(URL)에 의해 product id를 서버에 요청, 에러시 예외처리
     useEffect(()=>{
-        axios.get(`http://localhost:5000/api/products/${id}`)
-             .then(response => setProduct(response.data))
+        agent.Catalog.details(parseInt(id!))
+             .then(response => setProduct(response))
              .catch(error=> console.log(error))
              .finally(()=> setLoading(false));
     },[id])
