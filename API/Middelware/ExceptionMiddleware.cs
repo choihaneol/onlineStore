@@ -12,7 +12,7 @@ namespace API.Middelware
     {
 
         private readonly RequestDelegate _next; //call next middleware
-        private readonly ILogger<ExceptionMiddleware> _logger;
+        private readonly ILogger<ExceptionMiddleware> _logger; //log
         private readonly IHostEnvironment _env; //let me know which mode we're runnning
 
         public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IHostEnvironment env)
@@ -22,23 +22,25 @@ namespace API.Middelware
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+
+        //InvokeAsync : each middleware method has to have invoke method
+        public async Task InvokeAsync(HttpContext context) //HttpContext : a container for a single request and make response
         {
             try
             {
-                await _next(context);
+                await _next(context); 
             }
             catch(Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = 500;
+                context.Response.ContentType = "application/json";  //response 형식
+                context.Response.StatusCode = 500; // status code
 
                 var response = new ProblemDetails
                 {
                     Status = 500,
-                    Detail = _env.IsDevelopment() ? ex.StackTrace?.ToString() : null,
-                    Title = ex.Message 
+                    Detail = _env.IsDevelopment() ? ex.StackTrace?.ToString() : null, //full error message
+                    Title = ex.Message  //error exact title
                 };
 
                 var options = new JsonSerializerOptions{PropertyNamingPolicy = JsonNamingPolicy.CamelCase}; //json format을 camel case 형식으로 전송
@@ -49,6 +51,5 @@ namespace API.Middelware
 
             }
         }
-
     }
 }

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
-    public class ProductsController : BaseApiController  //API controller attribute 
+    public class ProductsController : BaseApiController  //BaseApiController는 ProductController 에서 파생됨
     {
         private readonly StoreContext _context;
 
@@ -28,7 +28,13 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            return await _context.Products.FindAsync(id);
+
+            //product가 존재하지 않을때 
+            var product = await _context.Products.FindAsync(id);
+
+            if (product == null) return NotFound();
+
+            return product;
         }
 
 
