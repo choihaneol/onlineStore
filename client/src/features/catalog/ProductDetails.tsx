@@ -9,6 +9,7 @@ import LoadingComponent from "../../app/layout/LoadingComponent";
 
 //useParams : returns object of key/value pairs of URL parameters
 export default function ProductDetails() {
+    //debugger;
     const {id} = useParams<{id:string}>();
     const [product, setProduct] = useState<Product|null>(null);//component에 product 가져옴
     const [loading, setLoading] = useState(true); //component를 초기화할때 loading=true
@@ -20,6 +21,8 @@ export default function ProductDetails() {
              .catch(error=> console.log(error.response))
              .finally(()=> setLoading(false));
     },[id])
+
+
     
     if(loading) return <LoadingComponent message='Loading Product...'/>
 
