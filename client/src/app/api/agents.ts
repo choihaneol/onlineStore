@@ -8,6 +8,9 @@ centralize all of our access configuration and our queries
 to make it easier to use inside components.
 */
 
+//Promise : 비동기처리 , for progress bar
+const sleep = () => new Promise(resolve => setTimeout(resolve, 500));  
+
 axios.defaults.baseURL = 'http://localhost:5000/api/';
 
 
@@ -16,8 +19,11 @@ const responseBody = (response:AxiosResponse) => response.data;
 
 
 //interceptor. get error message from axios if error occurs
-axios.interceptors.response.use(response => {
+axios.interceptors.response.use(async response => {
+    //비동기처리
+    await sleep();
     return response
+
 },(error: AxiosError)=>{
     const { data, status } = error.response as any;
 

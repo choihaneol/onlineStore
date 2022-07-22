@@ -5,6 +5,7 @@ import axios from "axios";
 import { Product } from "../../app/models/product";
 import agent from "../../app/api/agents";
 import NotFound from "../../app/api/errors/NoFound";
+import LoadingComponent from "../../app/layout/LoadingComponent";
 
 //useParams : returns object of key/value pairs of URL parameters
 export default function ProductDetails() {
@@ -20,7 +21,7 @@ export default function ProductDetails() {
              .finally(()=> setLoading(false));
     },[id])
     
-    if(loading) return <h3>Loading...</h3>
+    if(loading) return <LoadingComponent message='Loading Product...'/>
 
     if(!product) return <NotFound/>
 
