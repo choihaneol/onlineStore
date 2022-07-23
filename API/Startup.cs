@@ -66,9 +66,10 @@ namespace API
 
 
             //core를 사용해서 header 생성 like "Access-Control-Allow-Origin"
+            //AllowCredentials(): method to pass cookies 
             app.UseCors(opt =>
             {
-                opt.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+                opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:3000");
             });
 
 

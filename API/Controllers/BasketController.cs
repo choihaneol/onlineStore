@@ -19,7 +19,7 @@ namespace API.Controllers
             _context = context;
         }
 
-        [HttpGet]
+        [HttpGet(Name = "GetBasket")]
         public async Task<ActionResult<BasketDto>> GetBasket()
         {
             var basket = await RetrieveBasket();
@@ -27,29 +27,14 @@ namespace API.Controllers
             if (basket == null) return NotFound();
 
             //Json serializer error > DTO 생성 > DTO 형태로 반환 
-            return new BasketDto
-            {
-                Id = basket.Id, 
-                BuyerId = basket.BuyerId,
-                Items = basket.Items.Select(item => new BasketItemDto
-                {
-                    ProductId = item.ProductId, 
-                    Name = item.Product.Name,
-                    Price = item.Product.Price,
-                    PictureUrl = item.Product.PictureUrl,
-                    Type = item.Product.Type,
-                    Brand = item.Product.Brand,
-                    Quantity = item.Quantity
-
-                }).ToList()
-
-            };
+            return MapBasketDto(basket);
         }
 
-       
+        
+
         [HttpPost] // api/bascket?productId=3&quantity=2
         //ActionResult:return the models to the views, file streams and redirect to the controller
-        public async Task<ActionResult> AddItemToBasket(int productId, int quantity) 
+        public async Task<ActionResult<BasketDto>> AddItemToBasket(int productId, int quantity) 
         {
             //get basket
             var basket = await RetrieveBasket();
@@ -68,7 +53,8 @@ namespace API.Controllers
             //_context.SaveChangesAsync():if something has happened to our database, the # of chages return
             var result = await _context.SaveChangesAsync() > 0;
 
-            if (result) return StatusCode(201);
+            //mozila public 201 return type 을 맞추기 위해서..
+            if (result) return CreatedAtRoute("GetBasket", MapBasketDto(basket)); //CreatedAtRoute: "/GetBasket" end point URL로 return 
 
             return BadRequest(new ProblemDetails{Title="Problem saving item to basket"});
         }
@@ -111,6 +97,27 @@ namespace API.Controllers
             var basket = new Basket{BuyerId = buyerId};
             _context.Baskets.Add(basket);
             return basket;
+        }
+
+        private static BasketDto MapBasketDto(Basket basket)
+        {
+            return new BasketDto
+            {
+                Id = basket.Id,
+                BuyerId = basket.BuyerId,
+                Items = basket.Items.Select(item => new BasketItemDto
+                {
+                    ProductId = item.ProductId,
+                    Name = item.Product.Name,
+                    Price = item.Product.Price,
+                    PictureUrl = item.Product.PictureUrl,
+                    Type = item.Product.Type,
+                    Brand = item.Product.Brand,
+                    Quantity = item.Quantity
+
+                }).ToList()
+
+            };
         }
 
     }
