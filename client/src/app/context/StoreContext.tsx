@@ -1,7 +1,7 @@
 import { createContext, PropsWithChildren, useContext, useState } from "react";
 import { Basket } from "../models/basket";
 
-interface StoreContextValue{
+interface StoreContextValue{ //props로 일일이 넘겨 주는 대신 context로 데이터을 넘겨줌 
     basket : Basket | null;
     setBasket : (basket: Basket) => void;  //setBasket parameter:Basket / return type:void
     removeItem : (productId: number, quantity: number) => void;
@@ -9,6 +9,7 @@ interface StoreContextValue{
 
 //React Context : react x버전을 사용하겠다
 //StoreContext.tsx : Basket update. wrap around react component and make the properties and method inside here to all of our application
+//component 사용시 props를 넘겨주지 않아도됨 
 export const StoreContext = createContext<StoreContextValue | undefined> (undefined);
 
 export function useStoreContext(){
