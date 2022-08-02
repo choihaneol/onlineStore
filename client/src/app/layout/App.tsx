@@ -1,25 +1,28 @@
 import { ThemeProvider } from "@emotion/react";
-import { ContactPage } from "@mui/icons-material";
 import { createTheme, CssBaseline, Container } from "@mui/material";
 import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import AboutPage from "../../features/about/AboutPage";
 import BasketPage from "../../features/basket/BasketPage";
-import Catalog from "../../features/catalog/Catalog";
+import { setBasket } from "../../features/basket/basketSlice";
+ import Catalog from "../../features/catalog/Catalog";
 import ProductDetails from "../../features/catalog/ProductDetails";
+import CheckoutPage from "../../features/checkout/CheckoutPage";
+import ContactPage from "../../features/contact/ContactPage";
 import HomePage from "../../features/home/HomePage";
 import agent from "../api/agents";
 import NotFound from "../api/errors/NoFound";
 import ServerError from "../api/errors/ServerError";
-import { useStoreContext } from "../context/StoreContext";
+import { useAppDispatch } from "../store/configureStore";
 import { getCookie } from "../util/util";
 import Header from "./Header";
 import LoadingComponent from "./LoadingComponent";
 
-
 function App() {
-  const { setBasket } = useStoreContext();
+
+  //const { setBasket } = useStoreContext(); //context 
+  const dispatch = useAppDispatch(); //redux
   const [loading, setLoading] = useState(true);
   const [darkMode, setDarkMode] = useState(true); //darkmode function (start with light mode) 
 
@@ -28,13 +31,14 @@ function App() {
     const buyerId = getCookie('buyerId');
     if (buyerId) {
       agent.Basket.get()
-        .then(basket => setBasket(basket))
+        //.then(basket => setBasket(basket)) //context
+        .then(basket => dispatch(setBasket(basket))) //redux
         .catch(error => console.log(error))
         .finally(() => setLoading(false)); //setLoading(true)가 true 일 때만 
     }else{
       setLoading(false);
     }
-  }, [setBasket])
+  }, [dispatch])
 
 
   const paletteType = darkMode ? 'dark' : 'light';
@@ -73,6 +77,7 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/server-error" element={<ServerError />} />
           <Route path="/basket" element={<BasketPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
           <Route path='*' element={<NotFound />} />
         </Routes>
 

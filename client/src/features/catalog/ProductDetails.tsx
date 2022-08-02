@@ -5,14 +5,18 @@ import { Product } from "../../app/models/product";
 import agent from "../../app/api/agents";
 import NotFound from "../../app/api/errors/NoFound";
 import LoadingComponent from "../../app/layout/LoadingComponent";
-import { useStoreContext } from "../../app/context/StoreContext";
 import { LoadingButton } from "@mui/lab";
+import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
+import { removeItem, setBasket } from "../basket/basketSlice";
  
 //useParams : returns object of key/value pairs of URL parameters
 export default function ProductDetails() {
 
     //debugger;
-    const { basket, setBasket, removeItem } = useStoreContext();
+    //const { basket, setBasket, removeItem } = useStoreContext(); //context
+    const {basket} = useAppSelector(state => state.basket);
+    const dispatch = useAppDispatch();
+    
     const { id } = useParams<{ id: string }>();
     const [product, setProduct] = useState<Product | null>(null);//component에 product 가져옴
     const [loading, setLoading] = useState(true); //component를 초기화할때 loading=true
@@ -44,7 +48,8 @@ export default function ProductDetails() {
         if (!item || quantity > item.quantity) {
             const updatedQuantity = item ? quantity - item.quantity : quantity;
             agent.Basket.addItem(product?.id!, updatedQuantity)
-                .then(basket => setBasket(basket))
+                //.then(basket => setBasket(basket))
+                .then(basket => dispatch(setBasket(basket)))
                 .catch(error => console.log(error))
                 .finally(() => setSubmitting(false))
         } else {
@@ -55,7 +60,7 @@ export default function ProductDetails() {
 
             
             agent.Basket.removeItem(product?.id!, updatedQuantity) //updatedQuantity:업데이트 될 quantity
-                .then(() => removeItem(product?.id!, updatedQuantity))
+                .then(() => dispatch(removeItem({productId: product?.id!, quantity:updatedQuantity})))
                 .catch(error => console.log(error))
                 .finally(() => setSubmitting(false));
         }

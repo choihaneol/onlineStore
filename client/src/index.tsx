@@ -4,16 +4,16 @@ import App from './app/layout/App';
 import reportWebVitals from './reportWebVitals';
 import { unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
 import { createBrowserHistory } from 'history';
-import { StoreProvider } from './app/context/StoreContext';
+import { Provider } from 'react-redux';
+import { store } from './app/store/configureStore';
+   
 /*
 react router(URL matching, http requset)를 사용해서 
 페이지를 reload하는 대신 component끼리 swapping하여 SPA 적용
 */
-
+  
 //BrowserRouter: browse's history object and keeps and track of the states
 export const history: any = createBrowserHistory(); 
-
-
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -21,9 +21,11 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <HistoryRouter history={history}>
-      <StoreProvider> {/*StoreContext*/}
-      <App /> 
-      </StoreProvider>
+     {/* <StoreProvider> StoreContext*/}
+      <Provider store={store}>      
+        <App /> 
+      </Provider>
+     {/* </StoreProvider> */}
     </HistoryRouter>
   </React.StrictMode>
 );

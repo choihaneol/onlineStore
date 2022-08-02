@@ -1,16 +1,21 @@
 import { Delete, Remove } from "@material-ui/icons";
 import { Add } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
-import { Box, Grid, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import agent from "../../app/api/agents";
-import { useStoreContext } from "../../app/context/StoreContext";
+import {useAppDispatch, useAppSelector } from "../../app/store/configureStore";
+import { removeItem, setBasket } from "./basketSlice";
 import BasketSummary from "./BasketSummary";
 
 
 export default function BasketPage() {
 
-  const { basket, setBasket, removeItem } = useStoreContext();
+  //const { basket, setBasket, removeItem } = useStoreContext(); //context
+  const {basket} = useAppSelector(state => state.basket); //redux
+  const dispatch = useAppDispatch();  //redux
+
   const [status, setStatus] = useState({
     loading: false,
     name: ''
@@ -19,7 +24,8 @@ export default function BasketPage() {
   function handleAddItem(productId: number, name: string) {
     setStatus({ loading: true, name });
     agent.Basket.addItem(productId)
-      .then(basket => setBasket(basket))
+      //.then(basket => setBasket(basket)) //context
+      .then(basket => dispatch(setBasket(basket)))  //redux
       .catch(error => console.log(error))
       .finally(() => setStatus({ loading: false, name: '' }))
   }
@@ -27,9 +33,10 @@ export default function BasketPage() {
   function handleRemoveItem(productId: number, quantity = 1, name: string) {
     setStatus({ loading: true, name });
     agent.Basket.removeItem(productId, quantity)
-      .then(() => removeItem(productId, quantity))
+      //.then(() => removeItem(productId, quantity)) //context
+      .then(() => dispatch(removeItem({productId, quantity}))) //redux
       .catch(error => console.log(error))
-      .finally(() => setStatus({ loading: false, name: '' }));
+      .finally(() => setStatus({ loading: false, name: '' }))
   }
 
 
@@ -83,7 +90,7 @@ export default function BasketPage() {
                   <Add />
                 </LoadingButton>
               </TableCell>
-              <TableCell align="right">${((item.price/100) * item.quantity).toFixed(2)}</TableCell>
+              <TableCell align="right">${((item.price) * item.quantity).toFixed(2)}</TableCell>
               <TableCell align="right">
                 <LoadingButton
                   loading={status.loading && status.name === 'del' + item.productId}
@@ -101,6 +108,14 @@ export default function BasketPage() {
       <Grid item xs={6} />
       <Grid item xs={6} />
       <BasketSummary />
+      <Button
+      component={Link}
+      to='/checkout'
+      variant='contained'
+      size='large'
+      fullWidth>
+        Checkout
+      </Button>
     </Grid>
     </>
     
