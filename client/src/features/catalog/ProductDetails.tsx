@@ -7,21 +7,20 @@ import NotFound from "../../app/api/errors/NoFound";
 import LoadingComponent from "../../app/layout/LoadingComponent";
 import { LoadingButton } from "@mui/lab";
 import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
-import { removeItem, setBasket } from "../basket/basketSlice";
+import { addBasketItemAsync, removeBasketItemAsync } from "../basket/basketSlice";
  
 //useParams : returns object of key/value pairs of URL parameters
 export default function ProductDetails() {
 
     //debugger;
     //const { basket, setBasket, removeItem } = useStoreContext(); //context
-    const {basket} = useAppSelector(state => state.basket);
+    const {basket, status} = useAppSelector(state => state.basket);
     const dispatch = useAppDispatch();
     
     const { id } = useParams<{ id: string }>();
     const [product, setProduct] = useState<Product | null>(null);//component에 product 가져옴
     const [loading, setLoading] = useState(true); //component를 초기화할때 loading=true
     const [quantity, setQuantity] = useState(0); //quantity : quantity container에서 선택한 수량
-    const [submitting, setSubmitting] = useState(false);
     const item = basket?.items.find(i => i.productId === product?.id); //item.quantity : original cart quantity
     //updatedQuantity : update될 quantity
 
@@ -44,25 +43,13 @@ export default function ProductDetails() {
 
     /* Adding item to cart */
     function handleUpdateCart() {
-        setSubmitting(true);
-        if (!item || quantity > item.quantity) {
+         if (!item || quantity > item.quantity) {
             const updatedQuantity = item ? quantity - item.quantity : quantity;
-            agent.Basket.addItem(product?.id!, updatedQuantity)
-                //.then(basket => setBasket(basket))
-                .then(basket => dispatch(setBasket(basket)))
-                .catch(error => console.log(error))
-                .finally(() => setSubmitting(false))
+            dispatch(addBasketItemAsync({productId : product?.id!, quantity: updatedQuantity}))
         } else {
             const updatedQuantity = item.quantity - quantity;
-            console.log("item.quantity", item.quantity);
-            console.log("quantity", quantity);
-            console.log("updatedQuantity", updatedQuantity);
+            dispatch(removeBasketItemAsync({productId : product?.id!, quantity: updatedQuantity}))
 
-            
-            agent.Basket.removeItem(product?.id!, updatedQuantity) //updatedQuantity:업데이트 될 quantity
-                .then(() => dispatch(removeItem({productId: product?.id!, quantity:updatedQuantity})))
-                .catch(error => console.log(error))
-                .finally(() => setSubmitting(false));
         }
     }
 
@@ -127,8 +114,8 @@ export default function ProductDetails() {
                     {/*Quantity button */}
                     <Grid item xs={6}>
                         <LoadingButton
-                        disabled={item?.quantity === quantity || !item && quantity === 0}
-                            loading={submitting}
+                        disabled={item?.quantity === quantity }
+                            loading={status.includes('pendingRemoveItem' + item?.productId)}
                             onClick={handleUpdateCart}
                             sx={{ height: '55px' }}
                             color='primary'
