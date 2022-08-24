@@ -8,8 +8,8 @@ import Typography from '@mui/material/Typography';
 import { Avatar, CardHeader } from '@mui/material';
 import { Product } from '../../app/models/product';
 import { Link } from 'react-router-dom';
-  import { LoadingButton } from '@mui/lab';
- import { currencyFormat } from '../../app/util/util';
+import { LoadingButton } from '@mui/lab';
+import { currencyFormat } from '../../app/util/util';
 import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
 import { addBasketItemAsync} from '../basket/basketSlice';
 
@@ -20,7 +20,7 @@ interface Props {
 
 export default function ProductCard( {product} : Props) {
   const {status} = useAppSelector(state => state.basket);
-  //const {setBasket} = useStoreContext();
+   //const {setBasket} = useStoreContext();
   const dispatch = useAppDispatch();
 
 

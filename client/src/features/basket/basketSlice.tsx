@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import { error } from "console";
 import agent from "../../app/api/agents";
  import { Basket } from "../../app/models/basket"
 
@@ -15,7 +14,7 @@ const initialState : BasketState = {
 
 
 //redux(state 상태에 따른 Async정의)
-export const addBasketItemAsync = createAsyncThunk<Basket, {productId:number, quantity?:number}>(
+export const addBasketItemAsync = createAsyncThunk<Basket, {productId: number, quantity?: number}>(
     'basket/addBasketItemAsync',
     async ({productId, quantity =1 }) => {
         try{
@@ -52,9 +51,11 @@ export const basketSlice = createSlice ({
     
     //redux thunk 처리 (Async 결과에 따른 action) 
     extraReducers: (builder => {
+        //Add item to basket
         builder.addCase(addBasketItemAsync.pending, (state, action) => { //pending case
             console.log(action);
             state.status = 'pendingAddItem' + action.meta.arg.productId;  //meta.arg : for console log
+            console.log("state.status" + state.status);
         });
         builder.addCase(addBasketItemAsync.fulfilled, (state, action) =>{ //basket을 action payload에 셋팅
             state.basket = action.payload;
@@ -63,9 +64,10 @@ export const basketSlice = createSlice ({
         builder.addCase(addBasketItemAsync.rejected, (state) =>{ //recject case
             state.status = 'idle';
         });
+       
+        //Remove item to basket
         builder.addCase(removeBasketItemAsync.pending, (state, action) => {
             state.status = 'pendingRemoveItem' + action.meta.arg.productId + action.meta.arg.name;
-
         });
         builder.addCase(removeBasketItemAsync.fulfilled, (state, action) => {
             const {productId, quantity} = action.meta.arg;
@@ -78,7 +80,6 @@ export const basketSlice = createSlice ({
         })
         builder.addCase(removeBasketItemAsync.rejected, (state) => {
             state.status = 'idle';
-
         })
     })
 })
